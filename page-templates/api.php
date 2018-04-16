@@ -16,50 +16,51 @@ require 'config.php';
 use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
 
-$raw_data = fopen(get_stylesheet_directory()."/page-templates/MOCK_DATA.csv", "r");
-$newCustomers = array();
-while(!feof($raw_data)){
-    $custInfo=(fgetcsv($raw_data));
-    $company=$custInfo[0];
-    $fname=$custInfo[1];
-    $lname=$custInfo[2];
-    $email=$custInfo[3];
 
-    $new_customer = [
-        'email' => $email,
-        'first_name' => $fname,
-        'last_name' => $lname,
-        'username' => $email,
-        'password' => '12345',
-        'billing' => [
-            'first_name' => $fname,
-            'last_name' => $lname,
-            'company' => $company,
-            'address_1' => '',
-            'address_2' => '',
-            'city' => '',
-            'state' => '',
-            'postcode' => '',
-            'country' => '',
-            'email' => $email,
-            'phone' => ''
-        ],
-        'shipping' => [
-            'first_name' => $fname,
-            'last_name' => $lname,
-            'company' => $company,
-            'address_1' => '',
-            'address_2' => '',
-            'city' => '',
-            'state' => '',
-            'postcode' => '',
-            'country' => ''
-        ]
-    ];
-    array_push($newCustomers, $new_customer);
-}
+$url = 'https://mars.excellent.ee:2888/api/1/webngproductvc';
 
-//var_dump($newCustomers);
+$context = stream_context_create(array(
+    'http' => array(
+        'header'  => "Authorization: Basic " . base64_encode("$username:$password")
+    )
+));
+$data = file_get_contents($url, false, $context);
+
+echo $data;
+
+$newArticles = array();
+//while(!feof($raw_data)){
+//    $custInfo=(fgetcsv($raw_data));
+//    $company=$custInfo[0];
+//    $fname=$custInfo[1];
+//    $lname=$custInfo[2];
+//    $email=$custInfo[3];
+//
+//    $new_article = [
+//        'name' => 'Premium Quality',
+//        'type' => 'simple',
+//        'regular_price' => '21.99',
+//        'description' => '',
+//        'short_description' => '',
+//        'categories' => [
+//            [
+//                'id' => 9
+//            ],
+//            [
+//                'id' => 14
+//            ]
+//        ],
+//        'images' => [
+//            [
+//                'src' => '',
+//                'position' => 0
+//            ]
+//        ]
+//    ];
+//    array_push($newArticles, $new_article);
+//}
+
+//var_dump($newArticles);
 
 $woocommerce = new Client(
     $store,
@@ -71,14 +72,14 @@ $woocommerce = new Client(
     ]
 );
 
-foreach ($newCustomers as $customer) {
-    try {
-        $results = $woocommerce->post('customers', $customer);
-        echo "<p>Customer ".$results->email." was created.</p>";
-
-    } catch (HttpClientException $e) {
-        echo "<p>".$e->getMessage()."</p>"; // Error message.
-        $e->getRequest(); // Last request data.
-        $e->getResponse(); // Last response data.
-    }
-}
+//foreach ($newArticles as $customer) {
+//    try {
+//        $results = $woocommerce->post('customers', $customer);
+//        echo "<p>Customer ".$results->email." was created.</p>";
+//
+//    } catch (HttpClientException $e) {
+//        echo "<p>".$e->getMessage()."</p>"; // Error message.
+//        $e->getRequest(); // Last request data.
+//        $e->getResponse(); // Last response data.
+//    }
+//}
