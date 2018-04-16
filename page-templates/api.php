@@ -17,16 +17,17 @@ use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
 
 
-$url = 'https://mars.excellent.ee:2888/api/1/webngproductvc';
-
+$url = 'https://mars.excellent.ee:2888/api/1/invc?fields=code,name,group,uprice1';
 $context = stream_context_create(array(
     'http' => array(
-        'header'  => "Authorization: Basic " . base64_encode("$username:$password")
+        'header'  => "Authorization: Basic " . base64_encode("$username:$password"),
+        'timeout' => .5
     )
 ));
-$data = file_get_contents($url, false, $context);
+$raw_data = file_get_contents($url, false, $context);
+$data = json_decode($raw_data);
 
-echo $data;
+var_dump($raw_data);
 
 $newArticles = array();
 //while(!feof($raw_data)){
