@@ -17,7 +17,7 @@ use Automattic\WooCommerce\Client;
 use Automattic\WooCommerce\HttpClient\HttpClientException;
 
 
-$url = 'https://mars.excellent.ee:2888/api/1/invc?fields=code,name,group,uprice1,weight';
+$url = 'https://mars.excellent.ee:2888/api/1/invc?fields=code,name,group,uprice1,weight,uuid';
 $context = stream_context_create(array(
     'http' => array(
         'header'  => "Authorization: Basic " . base64_encode("$username:$password"),
@@ -30,11 +30,11 @@ $raw_data = new SimpleXMLElement($data);
 $newArticles = array();
 
 foreach ($raw_data->INVc as $article) {
-    $code = (integer)$article->Code;
+    $id = (string)$article->Code;
     $name = (string)$article->Name;
     $price = (string)$article->UPrice1;
     $category = (string)$article->Group;
-    $weight = (integer)$article->Weight;
+    $weight = (string)$article->Weight;
 
     switch ($category) {
         case "JOON":
@@ -46,9 +46,13 @@ foreach ($raw_data->INVc as $article) {
     }
 
     $new_article = [
+        'sku' => $id,
         'name' => $name,
         'type' => 'simple',
         'regular_price' => $price,
+        'manage_stock'   => true,
+        'stock_quantity' => 2,
+        'in_stock' => true,
         'description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',
         'short_description' => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.',
         'weight' => $weight,
@@ -59,7 +63,7 @@ foreach ($raw_data->INVc as $article) {
         ],
         'images' => [
             [
-                'src' => 'http://demo.woothemes.com/woocommerce/wp-content/uploads/sites/56/2013/06/T_2_front.jpg',
+                'src' => 'http://localhost/wordpress/wp-content/uploads/2018/04/'.$id.'.jpg',
                 'position' => 0
             ]
         ]
@@ -68,6 +72,8 @@ foreach ($raw_data->INVc as $article) {
 }
 
 //var_dump($newArticles);
+$upload_dir = wp_upload_dir();
+echo $upload_dir['baseurl']."/product_img/";
 
 $woocommerce = new Client(
     $store,
@@ -79,14 +85,43 @@ $woocommerce = new Client(
     ]
 );
 
-foreach ($newArticles as $product) {
-    try {
-        $results = $woocommerce->post('products', $product);
-        echo "<p>Toode lisati.</p>";
+//TOODETE LISAMINE
+//foreach ($newArticles as $product) {
+//    try {
+//        $results = $woocommerce->post('products', $product);
+//        echo "<p>Toode ".$results->name." loodi.</p>";
+//
+//    } catch (HttpClientException $e) {
+//        echo "<p>".$e->getMessage()."</p>"; // Error message.
+//        $e->getRequest(); // Last request data.
+//        $e->getResponse(); // Last response data.
+//    }
+//}
 
-    } catch (HttpClientException $e) {
-        echo "<p>".$e->getMessage()."</p>"; // Error message.
-        $e->getRequest(); // Last request data.
-        $e->getResponse(); // Last response data.
-    }
-}
+//TOOTE UPDATE
+//try {
+//    $results_wp = $woocommerce->get('products');
+//    foreach ($results_wp as $result) {
+//        $wp_sku = $result->sku;
+//        $wp_id = $result->id;
+//        foreach ($newArticles as $product) {
+//            if($wp_sku == $product['sku']) {
+//                try {
+//                    $results = $woocommerce->put('products/' . $wp_id, $product);
+//                    echo "<p>Toode " . $results->sku . " muudeti.</p>";
+//
+//                } catch (HttpClientException $e) {
+//                    echo "<p>" . $e->getMessage() . "</p>"; // Error message.
+//                    $e->getRequest(); // Last request data.
+//                    $e->getResponse(); // Last response data.
+//                }
+//            }
+//        }
+//    }
+////    var_dump($results);
+//
+//} catch (HttpClientException $e) {
+//    echo "<p>".$e->getMessage()."</p>"; // Error message.
+//    $e->getRequest(); // Last request data.
+//    $e->getResponse(); // Last response data.
+//}
