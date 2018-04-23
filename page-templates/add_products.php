@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Madis custom
+ * Template Name: Toodete lisamine
  *
  * Template for displaying a page without sidebar even if a sidebar widget is published.
  *
@@ -24,7 +24,7 @@ require 'config.php';
 
                     <?php
 
-                    include 'api.php';
+                    include 'add.php';
 
                     ?>
 
