@@ -71,9 +71,6 @@ foreach ($raw_data->INVc as $article) {
     array_push($newArticles, $new_article);
 }
 
-//var_dump($newArticles);
-//$upload_dir = wp_upload_dir();
-//echo $upload_dir["baseurl"]."/product_img/".$id.".jpg";
 
 $woocommerce = new Client(
     $store,
