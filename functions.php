@@ -78,3 +78,25 @@ function madis_cf7_custom() {
     <?php
 }
 add_action( 'wp_footer', 'madis_cf7_custom', 99999 );
+
+//add_action('woocommerce_thankyou', 'enroll_student', 10, 1);
+function enroll_student( $order_id ) {
+
+    if ( ! $order_id )
+        return;
+
+    // Getting an instance of the order object
+    $order = wc_get_order( $order_id );
+    echo "<p>madis_test</p>";
+
+    if($order->is_paid())
+        $paid = 'yes';
+    else
+        $paid = 'no';
+
+    // iterating through each order items (getting product ID and the product object)
+    // (work for simple and variable products)
+
+    // Displaying something
+    echo '<p>Order ID: '. $order_id . ' — Order Status: ' . $order->get_status() . ' — Order is paid: ' . $paid . '</p>';
+}
